@@ -115,7 +115,7 @@
       })
       .then(response => response.text())
       .then(text => {
-        if (text.includes("Success")) {
+        if (text.trim() === "Success") {  // Exact match for "Success"
           window.location.href = "thank-you.html";
         } else {
           alert("Submission error. Please try again.");
