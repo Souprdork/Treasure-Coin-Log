@@ -12,23 +12,34 @@
         <h1>Log Your Treasure Coin</h1>
     </header>
 
-    <form action="https://docs.google.com/forms/u/0/d/e/1FAIpQLSc2TlL2QIEflno8USPZRwIjmzLejnC8nXGLqqDXQMyWKqQ1lw/formResponse" method="POST">
-        <label for="trackable">Trackable Number:</label>
-        <input type="text" id="trackable" name="trackable">
+   <form action="https://docs.google.com/forms/d/e/1FAIpQLSdTOVJ7zgtwsY2P4U9KMr4c9kOBoU9cALklpiW0aHAdA6NW5A/formResponse" method="POST" target="hidden_iframe" onsubmit="submitted=true">
+  <label>Which Treasure Coin have you found?</label><br>
+  <input name="entry.124656620" required><br><br>
 
-        <label for="username">Your Username (Optional):</label>
-        <input type="text" id="username" name="username">
+  <label>What cache was the Treasure Coin found in?</label><br>
+  <input name="entry.859340610" required><br><br>
 
-        <label for="city">City:</label>
-        <input type="text" id="city" name="city">
+  <label>What City was it found in?</label><br>
+  <input name="entry.1991310281" required><br><br>
 
-        <label for="state">State:</label>
-        <input type="text" id="state" name="state">
+  <label>What State was it found in?</label><br>
+  <input name="entry.1502282316" required><br><br>
 
-        <label for="location">Location Description:</label>
-        <input type="text" id="location" name="location">
+  <label>When did you find the Treasure Coin?</label><br>
+  <input type="date" name="entry.1810358280" required><br><br>
 
-        <input type="submit" value="Log Coin">
+  <label>What is your Geocaching username?</label><br>
+  <input name="entry.2108576900"><br><br>
+
+  <label>Please describe the location you found the coin.</label><br>
+  <textarea name="entry.1689462249" rows="3"></textarea><br><br>
+
+  <button type="submit">Submit Log</button>
+  <p><em>Thank you for your log. Please hide the Treasure Coin in a new cache as soon as you can.</em></p>
+</form>
+
+<iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
+
     </form>
 
     <footer>
