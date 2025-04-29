@@ -62,42 +62,42 @@
     <h1>Log Your Treasure Coin</h1>
   </header>
 
-  <form id="logForm" action="https://script.google.com/macros/s/AKfycbzEIUQih0nlQT4nNJ_L5t4TmZihrW7ChGMIFTBxVrRry870X1a8cZ-qnbnGcG89fw6D/exec" method="POST">
+<form id="logForm" action="https://script.google.com/macros/s/AKfycbzEIUQih0nlQT4nNJ_L5t4TmZihrW7ChGMIFTBxVrRry870X1a8cZ-qnbnGcG89fw6D/exec" method="POST">
     <label for="coin">Which Treasure Coin have you found?</label>
-    <select name="Coin ID" id="coin" required>
-      <option value="" disabled selected>Select a Coin</option>
-      <option value="TC001">TC001</option>
-      <option value="TC002">TC002</option>
-      <option value="TC003">TC003</option>
-      <option value="TC004">TC004</option>
-      <option value="TC005">TC005</option>
-      <option value="TC006">TC006</option>
-      <option value="TC007">TC007</option>
-      <option value="TC008">TC008</option>
-      <option value="TC009">TC009</option>
-      <option value="TC010">TC010</option>
+    <select name="coin_id" id="coin" required>
+        <option value="" disabled selected>Select a Coin</option>
+        <option value="TC001">TC001</option>
+        <option value="TC002">TC002</option>
+        <option value="TC003">TC003</option>
+        <option value="TC004">TC004</option>
+        <option value="TC005">TC005</option>
+        <option value="TC006">TC006</option>
+        <option value="TC007">TC007</option>
+        <option value="TC008">TC008</option>
+        <option value="TC009">TC009</option>
+        <option value="TC010">TC010</option>
     </select>
 
     <label for="cache">Cache ID (Optional)</label>
-    <input type="text" name="Cache ID" id="cache" />
+    <input type="text" name="cache_id" id="cache" />
 
     <label for="city">City</label>
-    <input type="text" name="City" id="city" required />
+    <input type="text" name="city" id="city" required />
 
     <label for="state">State</label>
-    <input type="text" name="State" id="state" required />
+    <input type="text" name="state" id="state" required />
 
     <label for="date">Date Found</label>
-    <input type="date" name="Date" id="date" required />
+    <input type="date" name="date_found" id="date" required />
 
     <label for="username">Geocaching Username (Optional)</label>
-    <input type="text" name="Geocaching Username" id="username" />
+    <input type="text" name="username" id="username" />
 
     <label for="description">Location Description (Optional)</label>
-    <textarea name="Location Description" id="description" rows="3"></textarea>
+    <textarea name="description" id="description" rows="3"></textarea>
 
     <button type="submit">Submit Log</button>
-  </form>
+</form>
 
   <footer>
     <p>After logging, please hide the Treasure Coin in a new cache as soon as you can. Thank you for keeping the adventure alive!</p>
