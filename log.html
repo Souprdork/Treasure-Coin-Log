@@ -3,22 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Log Your Coin</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Log Your Treasure Coin</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        header {
+            background-color: #222;
+            color: #fff;
+            text-align: center;
+            padding: 2rem 1rem;
+        }
+
+        header img {
+            max-width: 150px;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin: 0;
+        }
+
+        main {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .form-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 150%; /* 4:3 aspect ratio fallback */
+            height: 0;
+            overflow: hidden;
+        }
+
+        .form-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            font-size: 0.9rem;
+            background-color: #eee;
+        }
+
+        @media (min-width: 600px) {
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
 </head>
 <body>
+
     <header>
-        <img src="tribal dragon for coin 2.svg" alt="Treasure Coin Logo" width="200">
+        <img src="tribal dragon for coin 2.svg" alt="Treasure Coin Logo">
         <h1>Log Your Treasure Coin</h1>
     </header>
 
     <main>
-        <!-- Embedded Google Form -->
-       <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSc2TlL2QIEflno8USPZRwIjmzLejnC8nXGLqqDXQMyWKqQ1lw/viewform?embedded=true" width="640" height="1759" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+        <div class="form-container">
+            <iframe 
+                src="https://docs.google.com/forms/d/e/1FAIpQLSc2TlL2QIEflno8USPZRwIjmzLejnC8nXGLqqDXQMyWKqQ1lw/viewform?embedded=true" 
+                allowfullscreen>
+                Loading…
+            </iframe>
+        </div>
     </main>
 
     <footer>
         <p>After logging, please hide the Treasure Coin in a new cache as soon as you can. Thank you for keeping the adventure alive!</p>
     </footer>
+
 </body>
 </html>
