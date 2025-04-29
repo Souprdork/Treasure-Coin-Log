@@ -104,25 +104,27 @@
   </footer>
 
   <script>
-    document.getElementById("logForm").addEventListener("submit", function (e) {
-      e.preventDefault();
-      const form = e.target;
-      const data = new FormData(form);
+  document.getElementById("logForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const form = e.target;
+    const data = new FormData(form);
 
-      fetch(form.action, {
-        method: "POST",
-        body: data
-      }).then(response => {
-        if (response.ok) {
+    fetch(form.action, {
+      method: "POST",
+      body: data
+    }).then(response => response.text())
+      .then(text => {
+        if (text.trim() === "Success") {
           window.location.href = "thank-you.html";
         } else {
-          alert("Error submitting form. Please try again.");
+          alert("Error: " + text);
         }
       }).catch(error => {
         console.error("Form submission error:", error);
         alert("There was a problem submitting the form.");
       });
-    });
-  </script>
+  });
+</script>
+
 </body>
 </html>
