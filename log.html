@@ -62,7 +62,7 @@
     <h1>Log Your Treasure Coin</h1>
   </header>
 
-<form id="logForm" action="https://script.google.com/macros/s/AKfycbzEIUQih0nlQT4nNJ_L5t4TmZihrW7ChGMIFTBxVrRry870X1a8cZ-qnbnGcG89fw6D/exec" method="POST">
+  <form id="logForm" action="https://script.google.com/macros/s/AKfycbzEIUQih0nlQT4nNJ_L5t4TmZihrW7ChGMIFTBxVrRry870X1a8cZ-qnbnGcG89fw6D/exec" method="POST">
     <label for="coin">Which Treasure Coin have you found?</label>
     <select name="coin_id" id="coin" required>
         <option value="" disabled selected>Select a Coin</option>
@@ -97,36 +97,11 @@
     <textarea name="description" id="description" rows="3"></textarea>
 
     <button type="submit">Submit Log</button>
-</form>
+  </form>
 
   <footer>
     <p>After logging, please hide the Treasure Coin in a new cache as soon as you can. Thank you for keeping the adventure alive!</p>
   </footer>
 
-  <script>
-    document.getElementById("logForm").addEventListener("submit", function (e) {
-      e.preventDefault();
-      const form = e.target;
-      const data = new FormData(form);
-
-      fetch(form.action, {
-        method: "POST",
-        body: data
-      })
-      .then(response => response.text())
-      .then(text => {
-        if (text.trim() === "Success") {  // Exact match for "Success"
-          window.location.href = "thank-you.html";
-        } else {
-          alert("Submission error. Please try again.");
-          console.log("Response:", text);
-        }
-      })
-      .catch(error => {
-        console.error("Submission error:", error);
-        alert("There was a problem submitting the form.");
-      });
-    });
-  </script>
 </body>
 </html>
