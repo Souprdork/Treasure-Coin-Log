@@ -63,8 +63,8 @@
   </header>
 
   <form id="logForm" action="https://script.google.com/macros/s/AKfycbzEIUQih0nlQT4nNJ_L5t4TmZihrW7ChGMIFTBxVrRry870X1a8cZ-qnbnGcG89fw6D/exec" method="POST">
-    <label for="coin">Which Treasure Coin have you found?</label>
-    <select name="coin" id="coin" required>
+    <label for="coinId">Which Treasure Coin have you found?</label>
+    <select name="coinId" id="coinId" required>
       <option value="" disabled selected>Select a Coin</option>
       <option value="TC001">TC001</option>
       <option value="TC002">TC002</option>
@@ -78,8 +78,8 @@
       <option value="TC010">TC010</option>
     </select>
 
-    <label for="cache">Cache ID (Optional)</label>
-    <input type="text" name="cache" id="cache" />
+    <label for="cacheId">Cache ID (Optional)</label>
+    <input type="text" name="cacheId" id="cacheId" />
 
     <label for="city">City</label>
     <input type="text" name="city" id="city" required />
@@ -87,8 +87,8 @@
     <label for="state">State</label>
     <input type="text" name="state" id="state" required />
 
-    <label for="date">Date Found</label>
-    <input type="date" name="date" id="date" required />
+    <label for="dateFound">Date Found</label>
+    <input type="date" name="dateFound" id="dateFound" required />
 
     <label for="username">Geocaching Username (Optional)</label>
     <input type="text" name="username" id="username" />
@@ -108,7 +108,6 @@
       e.preventDefault();
       const form = e.target;
       const data = new FormData(form);
-      const queryString = new URLSearchParams(data).toString();
 
       fetch(form.action, {
         method: "POST",
