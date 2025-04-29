@@ -3,16 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <img src="tribal dragon for coin 2.svg" alt="Treasure Coin Logo" width="200">
-     <title>Log Your Treasure Coin</title>
+    <title>Log Your Coin</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-   
-<iframe src="https://docs.google.com/forms/d/e/1FAIpQLSc2TlL2QIEflno8USPZRwIjmzLejnC8nXGLqqDXQMyWKqQ1lw/viewform?embedded=true" width="640" height="1591" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+    <header>
+        <img src="logo.svg" alt="Treasure Coin Logo">
+        <h1>Log Your Treasure Coin</h1>
+    </header>
 
-</body>
-<footer>
+    <form action="https://docs.google.com/forms/u/0/d/e/1FAIpQLSc2TlL2QIEflno8USPZRwIjmzLejnC8nXGLqqDXQMyWKqQ1lw/formResponse" method="POST">
+        <label for="trackable">Trackable Number:</label>
+        <input type="text" id="trackable" name="trackable">
+
+        <label for="username">Your Username (Optional):</label>
+        <input type="text" id="username" name="username">
+
+        <label for="city">City:</label>
+        <input type="text" id="city" name="city">
+
+        <label for="state">State:</label>
+        <input type="text" id="state" name="state">
+
+        <label for="location">Location Description:</label>
+        <input type="text" id="location" name="location">
+
+        <input type="submit" value="Log Coin">
+    </form>
+
+    <footer>
         <p>Thank you for logging your coin! Remember to hide it in a new cache!</p>
     </footer>
+</body>
 </html>
