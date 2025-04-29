@@ -1,92 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Log a Treasure Coin</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 2rem;
-    }
-    label {
-      font-weight: bold;
-    }
-    input, textarea, select {
-      width: 100%;
-      margin-bottom: 1rem;
-      padding: 0.5rem;
-      font-size: 1rem;
-    }
-    button {
-      padding: 0.7rem 1.5rem;
-      font-size: 1rem;
-      cursor: pointer;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <title>Log Your Treasure Coin</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div class="container">
+    <h1>Log Your Treasure Coin</h1>
+    <form action="https://docs.google.com/forms/d/e/1FAIpQLSc2TlL2QIEflno8USPZRwIjmzLejnC8nXGLqqDXQMyWKqQ1lw/formResponse" method="POST" target="_self">
 
-  <h1>Log a Treasure Coin</h1>
-<form action="https://docs.google.com/forms/d/e/1FAIpQLSdTOVJ7zgtwsY2P4U9KMr4c9kOBoU9cALklpiW0aHAdA6NW5A/formResponse" method="POST" target="hidden_iframe" onsubmit="submitted=true;">
-        <label>Which Treasure Coin have you found?</label><br>
-        <select name="entry.124656620" required>
-            <option value="" disabled selected>Select a Coin</option>
-            <option value="TC001">TC001</option>
-            <option value="TC002">TC002</option>
-            <option value="TC003">TC003</option>
-            <option value="TC004">TC004</option>
-            <option value="TC005">TC005</option>
-            <option value="TC006">TC006</option>
-            <option value="TC007">TC007</option>
-            <option value="TC008">TC008</option>
-            <option value="TC009">TC009</option>
-            <option value="TC010">TC010</option>
-        </select><br
+      <label for="coin">Which coin did you find?</label>
+      <select name="entry.124656620" id="coin" required>
+        <option value="">Select a coin</option>
+        <option value="Treasure Coin 1">Treasure Coin 1</option>
+        <option value="Treasure Coin 2">Treasure Coin 2</option>
+        <option value="Treasure Coin 3">Treasure Coin 3</option>
+        <option value="Treasure Coin 4">Treasure Coin 4</option>
+        <option value="Treasure Coin 5">Treasure Coin 5</option>
+        <option value="Treasure Coin 6">Treasure Coin 6</option>
+        <option value="Treasure Coin 7">Treasure Coin 7</option>
+        <option value="Treasure Coin 8">Treasure Coin 8</option>
+        <option value="Treasure Coin 9">Treasure Coin 9</option>
+        <option value="Treasure Coin 10">Treasure Coin 10</option>
+      </select>
 
-    <label>What cache was the Treasure Coin found in?</label><br>
-    <input name="entry.859340610" required><br>
+      <label for="cache">What is the ID of the cache that you found the Treasure Coin in?(optional)</label>
+      <input type="text" name="entry.859340610" id="cache">
 
-    <label>What City was it found in?</label><br>
-    <input name="entry.1991310281" required><br>
+      <label for="city">What City was the Treasure Coin found in?:</label>
+      <input type="text" name="entry.1991310281" id="city" required>
 
-    <label>What State was it found in?</label><br>
-    <input name="entry.1502282316" required><br>
+      <label for="state">What State was the Treasure Coin found in?:</label>
+      <input type="text" name="entry.1502282316" id="state" required>
 
-    <label>When did you find the Treasure Coin?</label><br>
-    <input type="date" name="entry.1810358280" required><br>
+      <label for="date">When did you find the Treasure Coin?:</label>
+      <input type="date" name="entry.1810358280" id="date" required>
 
-    <label>What is your Geocaching username?</label><br>
-    <input name="entry.2108576900"><br>
+      <label for="username">What is your Geocaching username (optional):</label>
+      <input type="text" name="entry.2108576900" id="username">
 
-    <label>Please describe the location you found the coin.</label><br>
-    <textarea name="entry.1689462249" rows="4" required></textarea><br>
+      <label for="description">Basic description of location (optional):</label>
+      <input type="text" name="entry.1689462249" id="description">
 
-    <p><strong>Reminder:</strong> Please hide the Treasure Coin in a new cache as soon as you can!</p>
+      <button type="submit">Submit Log</button>
+    </form>
 
-    <button type="submit">Submit</button>
-  </form>
+    <p class="reminder">
+      <strong>Reminder:</strong> After logging, please hide the Treasure Coin in a new cache as soon as you can. Thank you for keeping the adventure alive!
+    </p>
 
-  <script>
-    document.getElementById("coinForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-
-      const form = e.target;
-      const data = new FormData(form);
-
-      const queryString = new URLSearchParams(data).toString();
-
-      fetch("https://docs.google.com/forms/d/e/1FAIpQLSdFo3no2MnkuRGrTgfn9PzHKPY2qEpGz9DYqdKXCUQzT9Mnmg/formResponse", {
-        method: "POST",
-        mode: "no-cors",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: queryString
-      }).then(() => {
-        window.location.href = "thank-you.html";
-      });
-    });
-  </script>
+  </div>
 </body>
 </html>
