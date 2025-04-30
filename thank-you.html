@@ -5,14 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Thank You for Logging!</title>
   <link rel="stylesheet" href="styles.css" />
+  <!-- Leaflet CSS for the map -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <style>
-    body { background-color: #DAA520; font-family: sans-serif; color: black; }
-    h1, h2 { color: darkred; }
-    a, button, select { color: darkred; background-color: black; }
-
-    #map { height: 400px; margin-bottom: 20px; }
-
     .state-shade {
       fill: darkred;
       fill-opacity: 0.4;
@@ -20,156 +15,94 @@
       stroke-width: 1;
     }
 
-    select {
-      width: 100%;
-      padding: 10px;
-      margin: 20px 0;
-      font-size: 16px;
+    .gold-pin {
+      background-color: gold;
+      border-radius: 50%;
+      width: 12px;
+      height: 12px;
+      display: block;
+      border: 2px solid #aa8800;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-
-    th, td {
-      padding: 8px 12px;
-      border: 1px solid #ddd;
-      text-align: center;
-    }
-
-    th {
-      background-color: #8B0000;
-      color: white;
-    }
-
-    tr:nth-child(even) {
-      background-color: #f2f2f2;
-    }
-
-    footer {
-      text-align: center;
-      margin-top: 40px;
-      font-size: 0.9em;
+    .leaflet-popup-content-wrapper {
+      background: #fff8e1;
+      color: #333;
     }
   </style>
 </head>
 <body>
   <header>
-    <img src="tribal dragon for coin 2.svg" alt="Treasure Coin Logo" width="50" />
+    <img src="tribal dragon for coin 2.svg" alt="Treasure Coin Logo" />
     <h1>Thank You for Logging a Treasure Coin!</h1>
     <p>Your data has been submitted. Below is a map showing where Treasure Coins have been found.<br> If you don't see your location, please refresh the page.</p>
   </header>
 
   <div id="map"></div>
 
-  <div>
-    <h2>Select a Treasure Coin to View Logs</h2>
-    <select id="coin-select">
-      <option value="all" selected>All Coins</option>
-    </select>
-  </div>
-
-  <div>
-    <h2>Log Data</h2>
-    <table id="log-table">
-      <thead>
-        <tr>
-          <th>Coin ID</th>
-          <th>Cache ID</th>
-          <th>City</th>
-          <th>State</th>
-          <th>Date Found</th>
-          <th>Username</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-
   <footer>
     <p>Please hide the coin and let the journey continue! Thank you for keeping the adventure alive!</p>
   </footer>
 
-  <!-- Scripts -->
+  <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <!-- TopoJSON for US state boundaries -->
+  <script src="https://unpkg.com/us-atlas@3/states-10m.json"></script>
+  <!-- D3 for topojson conversion -->
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script src="https://unpkg.com/topojson@3"></script>
 
   <script>
-    const stateIdToName = {
-      "01": "Alabama", "02": "Alaska", "04": "Arizona", "05": "Arkansas",
-      "06": "California", "08": "Colorado", "09": "Connecticut", "10": "Delaware",
-      "11": "District of Columbia", "12": "Florida", "13": "Georgia", "15": "Hawaii",
-      "16": "Idaho", "17": "Illinois", "18": "Indiana", "19": "Iowa",
-      "20": "Kansas", "21": "Kentucky", "22": "Louisiana", "23": "Maine",
-      "24": "Maryland", "25": "Massachusetts", "26": "Michigan", "27": "Minnesota",
-      "28": "Mississippi", "29": "Missouri", "30": "Montana", "31": "Nebraska",
-      "32": "Nevada", "33": "New Hampshire", "34": "New Jersey", "35": "New Mexico",
-      "36": "New York", "37": "North Carolina", "38": "North Dakota", "39": "Ohio",
-      "40": "Oklahoma", "41": "Oregon", "42": "Pennsylvania", "44": "Rhode Island",
-      "45": "South Carolina", "46": "South Dakota", "47": "Tennessee", "48": "Texas",
-      "49": "Utah", "50": "Vermont", "51": "Virginia", "53": "Washington",
-      "54": "West Virginia", "55": "Wisconsin", "56": "Wyoming"
-    };
+    const map = L.map('map').setView([39.5, -98.35], 4); // Center of U.S.
 
-    const map = L.map('map').setView([39.5, -98.35], 4);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(map);
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18
+    }).addTo(map);
 
-    // Dynamic dropdown + state/city processing
+    // Load public Google Sheet data as CSV
     fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vTWaKxHd44JeIfYteVBQJIZ4iMG6GoVARO6tqRpoorC5FrSiAhDktAxm7GpLwJ2ZozdIANpE0p2F9HM/pub?output=csv')
-      .then(res => res.text())
-      .then(csv => {
-        const rows = csv.trim().split('\n').slice(1).map(row => row.split(','));
-        const states = new Set();
+      .then(response => response.text())
+      .then(csvText => {
+        const rows = csvText.split('\n').slice(1); // Skip header
         const cities = [];
-        const coins = new Set();
+        const states = new Set();
 
-        rows.forEach(([coin_id, , city, state]) => {
-          if (coin_id) coins.add(coin_id.trim());
+        rows.forEach(row => {
+          const cols = row.split(',');
+          const city = cols[3]?.trim();
+          const state = cols[4]?.trim();
           if (city && state) {
-            cities.push({ city: city.trim(), state: state.trim() });
-            states.add(state.trim());
+            cities.push({ city, state });
+            states.add(state);
           }
         });
 
-        // Update dropdown
-        const select = document.getElementById('coin-select');
-        coins.forEach(coin => {
-          const option = document.createElement('option');
-          option.value = coin;
-          option.textContent = coin;
-          select.appendChild(option);
-        });
-
-        // Plot city markers
-        cities.forEach(({ city, state }) => {
-          fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(city + ', ' + state)}`)
-            .then(r => r.json())
+        // Plot pins for each city
+        cities.forEach(entry => {
+          fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(entry.city + ', ' + entry.state)}`)
+            .then(res => res.json())
             .then(data => {
               if (data.length > 0) {
                 const loc = data[0];
-                L.circleMarker([loc.lat, loc.lon], {
+                const marker = L.circleMarker([loc.lat, loc.lon], {
                   radius: 7,
                   color: '#aa8800',
                   fillColor: 'gold',
                   fillOpacity: 0.9
-                }).addTo(map).bindPopup(`<strong>${city}, ${state}</strong>`);
+                }).addTo(map);
+                marker.bindPopup(`<strong>${entry.city}, ${entry.state}</strong>`);
               }
             });
         });
 
-        // Shade visited states
+        // Shade states
         fetch('https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json')
-          .then(r => r.json())
+          .then(res => res.json())
           .then(us => {
             const geojson = topojson.feature(us, us.objects.states);
             geojson.features.forEach(f => {
-              const id = f.id.toString().padStart(2, '0');
-              const name = stateIdToName[id];
-              if (states.has(name)) {
+              const stateName = f.properties.name;
+              if (Array.from(states).includes(stateName)) {
                 L.geoJSON(f, {
                   style: {
                     fillColor: "darkred",
@@ -182,47 +115,71 @@
             });
           });
       });
-
-    // Load logs
-    function fetchCoinLogs(coinId) {
-      const url = coinId === 'all'
-        ? 'https://script.google.com/macros/s/AKfycbzEIUQih0nlQT4nNJ_L5t4TmZihrW7ChGMIFTBxVrRry870X1a8cZ-qnbnGcG89fw6D/exec'
-        : `https://script.google.com/macros/s/AKfycbzEIUQih0nlQT4nNJ_L5t4TmZihrW7ChGMIFTBxVrRry870X1a8cZ-qnbnGcG89fw6D/exec?coin_id=${coinId}`;
-
-      fetch(url)
-        .then(res => res.json())
-        .then(data => displayLogs(data))
-        .catch(err => console.error('Fetch error:', err));
+  </script>
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Treasure Coin Log Viewer</title>
+  <style>
+    body {
+      background-color: #DAA520;
+      color: black;
+      font-family: sans-serif;
+      padding: 20px;
     }
-
-    function displayLogs(logs) {
-      const tbody = document.querySelector('#log-table tbody');
-      tbody.innerHTML = '';
-      if (logs.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7">No logs available for the selected coin.</td></tr>';
-        return;
-      }
-
-      logs.forEach(log => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${log.coin_id}</td>
-          <td>${log.cache_id}</td>
-          <td>${log.city}</td>
-          <td>${log.state}</td>
-          <td>${log.date_found}</td>
-          <td>${log.username}</td>
-          <td>${log.description}</td>
-        `;
-        tbody.appendChild(row);
-      });
+    select {
+      font-size: 1rem;
+      padding: 5px 10px;
+      margin-bottom: 20px;
     }
+    iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Treasure Coin Logs</h1>
+  <label for="coinSelect"><strong>View logs for:</strong></label>
+  <select id="coinSelect" onchange="updateSheet()">
+    <option value="all">All Coins</option>
+    <option value="TC001">TC001</option>
+    <option value="TC002">TC002</option>
+    <option value="TC003">TC003</option>
+    <option value="TC004">TC004</option>
+    <option value="TC005">TC005</option>
+    <option value="TC006">TC006</option>
+    <option value="TC007">TC007</option>
+    <option value="TC008">TC008</option>
+    <option value="TC009">TC009</option>
+    <option value="TC010">TC010</option>
+  </select>
 
-    document.getElementById('coin-select').addEventListener('change', function () {
-      fetchCoinLogs(this.value);
-    });
+  <iframe id="sheetFrame" src="https://docs.google.com/spreadsheets/d/1uGZfjhB55cUY_Dnf8zLe6ZYS8FlI5zlK6Q8TP4jTdHo/edit?gid=0#gid=0&fvid=1774653410"></iframe>
 
-    fetchCoinLogs('all');
+  <script>
+    const sheetURLs = {
+      all: "https://docs.google.com/spreadsheets/d/1uGZfjhB55cUY_Dnf8zLe6ZYS8FlI5zlK6Q8TP4jTdHo/edit?gid=0#gid=0&fvid=1774653410",
+      TC001: "https://docs.google.com/spreadsheets/d/1uGZfjhB55cUY_Dnf8zLe6ZYS8FlI5zlK6Q8TP4jTdHo/edit?gid=0#gid=0&fvid=602235617",
+      TC002: "https://docs.google.com/spreadsheets/d/1uGZfjhB55cUY_Dnf8zLe6ZYS8FlI5zlK6Q8TP4jTdHo/edit?gid=0#gid=0&fvid=602235617",
+      TC003: "https://docs.google.com/spreadsheets/d/1uGZfjhB55cUY_Dnf8zLe6ZYS8FlI5zlK6Q8TP4jTdHo/edit?gid=0#gid=0&fvid=368090162",
+      TC004: "https://docs.google.com/spreadsheets/d/1uGZfjhB55cUY_Dnf8zLe6ZYS8FlI5zlK6Q8TP4jTdHo/edit?gid=0#gid=0&fvid=2030697374",
+      TC005: "https://docs.google.com/spreadsheets/d/1uGZfjhB55cUY_Dnf8zLe6ZYS8FlI5zlK6Q8TP4jTdHo/edit?gid=0#gid=0&fvid=74807509",
+      TC006: "https://docs.google.com/spreadsheets/d/1uGZfjhB55cUY_Dnf8zLe6ZYS8FlI5zlK6Q8TP4jTdHo/edit?gid=0#gid=0&fvid=795244075",
+      TC007: "https://docs.google.com/spreadsheets/d/1uGZfjhB55cUY_Dnf8zLe6ZYS8FlI5zlK6Q8TP4jTdHo/edit?gid=0#gid=0&fvid=772457474",
+      TC008: "https://docs.google.com/spreadsheets/d/1uGZfjhB55cUY_Dnf8zLe6ZYS8FlI5zlK6Q8TP4jTdHo/edit?gid=0#gid=0&fvid=1082029853",
+      TC009: "https://docs.google.com/spreadsheets/d/1uGZfjhB55cUY_Dnf8zLe6ZYS8FlI5zlK6Q8TP4jTdHo/edit?gid=0#gid=0&fvid=1508685173",
+      TC010: "https://docs.google.com/spreadsheets/d/1uGZfjhB55cUY_Dnf8zLe6ZYS8FlI5zlK6Q8TP4jTdHo/edit?gid=0#gid=0&fvid=514133757"
+    };
+
+    function updateSheet() {
+      const coin = document.getElementById("coinSelect").value;
+      const iframe = document.getElementById("sheetFrame");
+      iframe.src = sheetURLs[coin];
+    }
   </script>
 </body>
 </html>
