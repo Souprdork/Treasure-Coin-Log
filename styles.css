@@ -60,7 +60,7 @@ button {
 }
 
 button:hover {
-  background-color: #21867a;
+  background-color: #c61406;
 }
 
 /* Footer Styling */
@@ -68,7 +68,7 @@ footer {
   margin-top: 40px;
   text-align: center;
   font-size: 0.9em;
-  color: #777;
+  color: #c61406;
 }
 
 /* Map Styles */
