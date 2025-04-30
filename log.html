@@ -65,7 +65,7 @@
   <form id="logForm">
     <label for="coin">Which Treasure Coin have you found?</label>
     <small style="display: block; margin-top: 2px; margin-bottom: 5px; font-size: 0.9em; color: #333;">
-  Choose the coin ID printed on the coin you found.
+  Please choose the Treasure Coin ID printed on the coin you found.
 </small>
     <select name="coin_id" id="coin" required>
         <option value="" disabled selected>Select a Coin</option>
@@ -82,12 +82,21 @@
     </select>
 
     <label for="cache">Cache ID (Optional)</label>
+     <small style="display: block; margin-top: 2px; margin-bottom: 5px; font-size: 0.9em; color: #333;">
+  You can see the Cache ID under the cash name after you have selected the Cache. This helps me see excatly which Cache the coin was in.
+</small>
     <input type="text" name="cache_id" id="cache" />
 
     <label for="city">City</label>
+    <small style="display: block; margin-top: 2px; margin-bottom: 5px; font-size: 0.9em; color: #333;">
+  Please use the full name and proper spelling of the city that you found the Treasure Coin in.
+</small>
     <input type="text" name="city" id="city" required />
 
  <label for="state">State</label>
+     <small style="display: block; margin-top: 2px; margin-bottom: 5px; font-size: 0.9em; color: #333;">
+  Please slect the state that you found the Treasure Coin in. If not found in the U.S., select other.
+</small>
 <select name="state" id="state" required>
   <option value="" disabled selected>Select a State</option>
   <option value="Alabama">Alabama</option>
@@ -145,12 +154,21 @@
 
 
     <label for="date">Date Found</label>
+     <small style="display: block; margin-top: 2px; margin-bottom: 5px; font-size: 0.9em; color: #333;">
+  Please select the date that you found the Treasure Coin.
+</small>
     <input type="date" name="date_found" id="date" required />
 
     <label for="username">Geocaching Username (Optional)</label>
+     <small style="display: block; margin-top: 2px; margin-bottom: 5px; font-size: 0.9em; color: #333;">
+  This is not required, but just helps tell the story of the coin.
+</small>
     <input type="text" name="username" id="username" />
 
     <label for="description">Location Description (Optional)</label>
+     <small style="display: block; margin-top: 2px; margin-bottom: 5px; font-size: 0.9em; color: #333;">
+  Again, not required, but it helps tell the story of the Treasure Coin. Just a very brief or basic description of the location (i.e. The Park, By a church, At the Lake, In the woods, etc.)
+</small>
     <textarea name="description" id="description" rows="3"></textarea>
 
     <button type="submit" style="background-color: #8B0000; color: white; padding: 12px 20px; border: none; cursor: pointer; font-size: 16px; width: 100%;">Submit Log</button>
