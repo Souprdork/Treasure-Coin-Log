@@ -3,116 +3,103 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Thank You for Logging!</title>
+  <title>Thank You - Treasure Coin Logged</title>
   <link rel="stylesheet" href="styles.css" />
-  <!-- Leaflet CSS for the map -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script type="module" src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
-    .state-shade {
-      fill: darkred;
-      fill-opacity: 0.4;
-      stroke: #660000;
-      stroke-width: 1;
+    /* Optional: tighten up spacing for smaller screens */
+    h1 {
+      text-align: center;
+      font-size: 1.8rem;
+      margin-bottom: 10px;
     }
 
-    .gold-pin {
-      background-color: gold;
-      border-radius: 50%;
-      width: 12px;
-      height: 12px;
-      display: block;
-      border: 2px solid #aa8800;
-    }
-
-    .leaflet-popup-content-wrapper {
-      background: #fff8e1;
-      color: #333;
+    #map {
+      height: 500px;
+      width: 100%;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
   <header>
-    <img src="tribal dragon for coin 2.svg" alt="Treasure Coin Logo" />
-    <h1>Thank You for Logging a Treasure Coin!</h1>
-    <p>Your log has been submitted. Below is a map showing where Treasure Coins have been found.</p>
+    <img src="tribal dragon for coin 2.svg" alt="Treasure Coin Logo" width="50" />
+    <h1>Thanks for Logging Your Treasure Coin!</h1>
   </header>
 
-  <div id="map"></div>
+  <div class="container">
+    <p>Here's an interactive map showing where Treasure Coins have been found across the U.S.!</p>
+    <div id="map"></div>
+  </div>
 
   <footer>
-    <p>Thank you for keeping the adventure alive. Hide the coin and let the journey continue!</p>
+    <p>Keep the adventure going! Hide the coin in a new location and encourage others to play!</p>
   </footer>
 
-  <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <!-- TopoJSON for US state boundaries -->
-  <script src="https://unpkg.com/us-atlas@3/states-10m.json"></script>
-  <!-- D3 for topojson conversion -->
-  <script src="https://d3js.org/d3.v7.min.js"></script>
-  <script src="https://unpkg.com/topojson@3"></script>
-
+  <script src="https://unpkg.com/leaflet-choropleth@1.0.0/dist/choropleth.js"></script>
   <script>
-    const map = L.map('map').setView([39.5, -98.35], 4); // Center of U.S.
+    const map = L.map('map').setView([39.8283, -98.5795], 4); // Center of US
 
-    // Add OpenStreetMap tiles
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 18
+      attribution: '© OpenStreetMap contributors'
     }).addTo(map);
 
-    // Load public Google Sheet data as CSV
-    fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vTWaKxHd44JeIfYteVBQJIZ4iMG6GoVARO6tqRpoorC5FrSiAhDktAxm7GpLwJ2ZozdIANpE0p2F9HM/pub?output=csv')
-      .then(response => response.text())
-      .then(csvText => {
-        const rows = csvText.split('\n').slice(1); // Skip header
-        const cities = [];
-        const states = new Set();
+    // Load GeoJSON for US states
+    fetch('https://raw.githubusercontent.com/PublicaMundi/MappingAPI/master/data/geojson/us-states.json')
+      .then(response => response.json())
+      .then(statesData => {
+        const stateCounts = {};
+        const cityMarkers = [];
 
-        rows.forEach(row => {
-          const cols = row.split(',');
-          const city = cols[3]?.trim();
-          const state = cols[4]?.trim();
-          if (city && state) {
-            cities.push({ city, state });
-            states.add(state);
-          }
-        });
+        // Fetch CSV from Google Sheet (published as CSV)
+        fetch("https://docs.google.com/spreadsheets/d/e/2PACX-1vTWaKxHd44JeIfYteVBQJIZ4iMG6GoVARO6tqRpoorC5FrSiAhDktAxm7GpLwJ2ZozdIANpE0p2F9HM/pub?output=csv")
+          .then(response => response.text())
+          .then(csvText => {
+            const rows = csvText.split("\n").slice(1); // skip header
+            rows.forEach(row => {
+              const cols = row.split(",");
+              const state = cols[4]?.trim();
+              const city = cols[3]?.trim();
 
-        // Plot pins for each city
-        cities.forEach(entry => {
-          fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(entry.city + ', ' + entry.state)}`)
-            .then(res => res.json())
-            .then(data => {
-              if (data.length > 0) {
-                const loc = data[0];
-                const marker = L.circleMarker([loc.lat, loc.lon], {
-                  radius: 7,
-                  color: '#aa8800',
-                  fillColor: 'gold',
-                  fillOpacity: 0.9
-                }).addTo(map);
-                marker.bindPopup(`<strong>${entry.city}, ${entry.state}</strong>`);
+              if (state) {
+                stateCounts[state] = (stateCounts[state] || 0) + 1;
+              }
+
+              if (city && state) {
+                // Geocode city+state using OpenStreetMap's Nominatim
+                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(city + ", " + state)}`)
+                  .then(response => response.json())
+                  .then(data => {
+                    if (data && data[0]) {
+                      const lat = parseFloat(data[0].lat);
+                      const lon = parseFloat(data[0].lon);
+                      L.circleMarker([lat, lon], {
+                        radius: 6,
+                        fillColor: "#FFD700", // Gold
+                        color: "#FFD700",
+                        weight: 1,
+                        opacity: 1,
+                        fillOpacity: 0.9
+                      }).bindPopup(`${city}, ${state}`).addTo(map);
+                    }
+                  });
               }
             });
-        });
 
-        // Shade states
-        fetch('https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json')
-          .then(res => res.json())
-          .then(us => {
-            const geojson = topojson.feature(us, us.objects.states);
-            geojson.features.forEach(f => {
-              const stateName = f.properties.name;
-              if (Array.from(states).includes(stateName)) {
-                L.geoJSON(f, {
-                  style: {
-                    fillColor: "darkred",
-                    color: "#660000",
-                    weight: 1,
-                    fillOpacity: 0.4
-                  }
-                }).addTo(map);
+            // Add shaded state layer
+            L.geoJson(statesData, {
+              style: feature => {
+                const count = stateCounts[feature.properties.name] || 0;
+                return {
+                  fillColor: count > 0 ? "rgba(139,0,0,0.4)" : "#ccc", // Dark red transparent
+                  weight: 1,
+                  opacity: 1,
+                  color: "white",
+                  fillOpacity: 0.6
+                };
               }
-            });
+            }).addTo(map);
           });
       });
   </script>
