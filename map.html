@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Treasure Coin's journey so far.</title>
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Leaflet CSS for the map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    .state-shade {
+      fill: darkred;
+      fill-opacity: 0.4;
+      stroke: #660000;
+      stroke-width: 1;
+    }
+
+    .gold-pin {
+      background-color: gold;
+      border-radius: 50%;
+      width: 12px;
+      height: 12px;
+      display: block;
+      border: 2px solid #aa8800;
+    }
+
+    .leaflet-popup-content-wrapper {
+      background: #fff8e1;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="tribal dragon for coin 2.svg" alt="Treasure Coin Logo" />
+    <h1>The Treasure Coin's journey so far.</h1>
+    <p>Below is a map showing where Treasure Coins have been found, and you can select a Treasure Coin to see where it has been.<br> If you don't see your location, please refresh the page or check back in a few minutes.</p>
+  </header>
+
+  <div id="map"></div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <!-- TopoJSON for US state boundaries -->
+  <script src="https://unpkg.com/us-atlas@3/states-10m.json"></script>
+  <!-- D3 for topojson conversion -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://unpkg.com/topojson@3"></script>
+
+  <script>
+    const map = L.map('map').setView([39.5, -98.35], 4); // Center of U.S.
+
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18
+    }).addTo(map);
+
+    // Load public Google Sheet data as CSV
+    fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vTWaKxHd44JeIfYteVBQJIZ4iMG6GoVARO6tqRpoorC5FrSiAhDktAxm7GpLwJ2ZozdIANpE0p2F9HM/pub?output=csv')
+      .then(response => response.text())
+      .then(csvText => {
+        const rows = csvText.split('\n').slice(1); // Skip header
+        const cities = [];
+        const states = new Set();
+
+        rows.forEach(row => {
+          const cols = row.split(',');
+          const city = cols[3]?.trim();
+          const state = cols[4]?.trim();
+          if (city && state) {
+            cities.push({ city, state });
+            states.add(state);
+          }
+        });
+
+        // Plot pins for each city
+        cities.forEach(entry => {
+          fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(entry.city + ', ' + entry.state)}`)
+            .then(res => res.json())
+            .then(data => {
+              if (data.length > 0) {
+                const loc = data[0];
+                const marker = L.circleMarker([loc.lat, loc.lon], {
+                  radius: 7,
+                  color: '#aa8800',
+                  fillColor: 'gold',
+                  fillOpacity: 0.9
+                }).addTo(map);
+                marker.bindPopup(`<strong>${entry.city}, ${entry.state}</strong>`);
+              }
+            });
+        });
+
+        // Shade states
+        fetch('https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json')
+          .then(res => res.json())
+          .then(us => {
+            const geojson = topojson.feature(us, us.objects.states);
+            geojson.features.forEach(f => {
+              const stateName = f.properties.name;
+              if (Array.from(states).includes(stateName)) {
+                L.geoJSON(f, {
+                  style: {
+                    fillColor: "darkred",
+                    color: "#660000",
+                    weight: 1,
+                    fillOpacity: 0.4
+                  }
+                }).addTo(map);
+              }
+            });
+          });
+      });
+  </script>
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Treasure Coin Log Viewer</title>
+  <style>
+    body {
+      background-color: #FAFCB1;
+      color: black;
+      font-family: sans-serif;
+      padding: 20px;
+    }
+    select {
+      font-size: 1rem;
+      padding: 5px 10px;
+      margin-bottom: 20px;
+    }
+    iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Treasure Coin Logs</h1>
+  <label for="coinSelect"><strong>View logs for:</strong></label>
+  <select id="coinSelect" onchange="updateSheet()">
+    <option value="all">All Coins</option>
+    <option value="TC001">TC001</option>
+    <option value="TC002">TC002</option>
+    <option value="TC003">TC003</option>
+    <option value="TC004">TC004</option>
+    <option value="TC005">TC005</option>
+    <option value="TC006">TC006</option>
+    <option value="TC007">TC007</option>
+    <option value="TC008">TC008</option>
+    <option value="TC009">TC009</option>
+    <option value="TC010">TC010</option>
+  </select>
+
+<iframe id="sheetFrame"
+  src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTWaKxHd44JeIfYteVBQJIZ4iMG6GoVARO6tqRpoorC5FrSiAhDktAxm7GpLwJ2ZozdIANpE0p2F9HM/pubhtml?gid=636282693&single=true"
+  style="width: 100%; height: 600px; border: 2px solid darkred; background-color: white;">
+</iframe>
+  
+  <script>
+    const sheetURLs = {
+      all: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTWaKxHd44JeIfYteVBQJIZ4iMG6GoVARO6tqRpoorC5FrSiAhDktAxm7GpLwJ2ZozdIANpE0p2F9HM/pubhtml?gid=636282693&single=true",
+      TC001: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTWaKxHd44JeIfYteVBQJIZ4iMG6GoVARO6tqRpoorC5FrSiAhDktAxm7GpLwJ2ZozdIANpE0p2F9HM/pubhtml?gid=152828618&single=true",
+      TC002: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTWaKxHd44JeIfYteVBQJIZ4iMG6GoVARO6tqRpoorC5FrSiAhDktAxm7GpLwJ2ZozdIANpE0p2F9HM/pubhtml?gid=45891851&single=true",
+      TC003: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTWaKxHd44JeIfYteVBQJIZ4iMG6GoVARO6tqRpoorC5FrSiAhDktAxm7GpLwJ2ZozdIANpE0p2F9HM/pubhtml?gid=992477880&single=true",
+      TC004: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTWaKxHd44JeIfYteVBQJIZ4iMG6GoVARO6tqRpoorC5FrSiAhDktAxm7GpLwJ2ZozdIANpE0p2F9HM/pubhtml?gid=882226902&single=true",
+      TC005: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTWaKxHd44JeIfYteVBQJIZ4iMG6GoVARO6tqRpoorC5FrSiAhDktAxm7GpLwJ2ZozdIANpE0p2F9HM/pubhtml?gid=170017588&single=true",
+      TC006: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTWaKxHd44JeIfYteVBQJIZ4iMG6GoVARO6tqRpoorC5FrSiAhDktAxm7GpLwJ2ZozdIANpE0p2F9HM/pubhtml?gid=541786644&single=true",
+      TC007: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTWaKxHd44JeIfYteVBQJIZ4iMG6GoVARO6tqRpoorC5FrSiAhDktAxm7GpLwJ2ZozdIANpE0p2F9HM/pubhtml?gid=1426008021&single=true",
+      TC008: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTWaKxHd44JeIfYteVBQJIZ4iMG6GoVARO6tqRpoorC5FrSiAhDktAxm7GpLwJ2ZozdIANpE0p2F9HM/pubhtml?gid=948976144&single=true",
+      TC009: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTWaKxHd44JeIfYteVBQJIZ4iMG6GoVARO6tqRpoorC5FrSiAhDktAxm7GpLwJ2ZozdIANpE0p2F9HM/pubhtml?gid=869751630&single=true",
+      TC010: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTWaKxHd44JeIfYteVBQJIZ4iMG6GoVARO6tqRpoorC5FrSiAhDktAxm7GpLwJ2ZozdIANpE0p2F9HM/pubhtml?gid=1144577816&single=true"
+    };
+
+    function updateSheet() {
+      const coin = document.getElementById("coinSelect").value;
+      const iframe = document.getElementById("sheetFrame");
+      iframe.src = sheetURLs[coin];
+    }
+  </script>
+</body>
+</html>
