@@ -2,76 +2,109 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Thank You!</title>
+  <title>Thank You for Logging Your Treasure Coin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
     body {
-      font-family: sans-serif;
+      font-family: system-ui, sans-serif;
+      margin: 0;
+      padding: 0;
       text-align: center;
-      padding: 20px;
+      background: #f9f9f9;
+      color: #333;
     }
 
     h1 {
-      color: #2a9d8f;
+      font-size: 1.6rem;
+      margin: 1.2rem 1rem 0.5rem;
+    }
+
+    p {
+      font-size: 1rem;
+      margin: 0 1rem 1rem;
     }
 
     #map {
-      margin: 20px auto;
-      height: 600px;
-      width: 800px;
-      border: 2px solid #ccc;
+      width: 100%;
+      height: 70vh;
+      max-width: 1000px;
+      margin: auto;
+      border: 1px solid #ccc;
+    }
+
+    @media (min-width: 768px) {
+      h1 {
+        font-size: 2rem;
+      }
+
+      p {
+        font-size: 1.1rem;
+      }
+
+      #map {
+        height: 600px;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>Thank You for Logging Your Treasure Coin!</h1>
-  <p>Here’s where Treasure Coins have been found so far:</p>
 
+  <h1>Thank you for logging your Treasure Coin!</h1>
+  <p>Here's where other coins have been found.</p>
   <div id="map"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://leafletjs.com/examples/choropleth/us-states.js"></script>
   <script>
-    // Initialize the map
-    const map = L.map('map').setView([39.5, -98.35], 4); // Center on US
+    const map = L.map('map').setView([39.5, -98.35], 4); // Center of US
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    // Load data from published Google Sheet
     fetch("https://docs.google.com/spreadsheets/d/e/2PACX-1vTWaKxHd44JeIfYteVBQJIZ4iMG6GoVARO6tqRpoorC5FrSiAhDktAxm7GpLwJ2ZozdIANpE0p2F9HM/pub?output=csv")
       .then(response => response.text())
       .then(csvText => {
-        const rows = csvText.split("\n").slice(1); // skip header
-        const cities = new Set();
+        const rows = csvText.trim().split("\n").slice(1);
+        const foundStates = new Set();
+        const cityMarkers = [];
 
         rows.forEach(row => {
           const cols = row.split(",");
-
           const city = cols[3]?.trim();
           const state = cols[4]?.trim();
 
-          if (!city || !state) return;
+          if (state) foundStates.add(state);
+          if (city && state) cityMarkers.push(`${city}, ${state}`);
+        });
 
-          const location = `${city}, ${state}`;
-          if (cities.has(location)) return;
-          cities.add(location);
+        // Shade found states
+        L.geoJson(statesData, {
+          style: feature => ({
+            fillColor: foundStates.has(feature.properties.name) ? '#2a9d8f' : '#ccc',
+            weight: 1,
+            opacity: 1,
+            color: 'white',
+            fillOpacity: 0.7
+          })
+        }).addTo(map);
 
-          // Use OpenStreetMap Nominatim for city geocoding
-          fetch(`https://nominatim.openstreetmap.org/search?city=${encodeURIComponent(city)}&state=${encodeURIComponent(state)}&country=USA&format=json`)
+        // Place dots at found cities
+        cityMarkers.forEach(location => {
+          fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`)
             .then(res => res.json())
             .then(data => {
-              if (data && data[0]) {
-                const lat = parseFloat(data[0].lat);
-                const lon = parseFloat(data[0].lon);
+              if (data[0]) {
+                const { lat, lon } = data[0];
                 L.circleMarker([lat, lon], {
                   radius: 6,
                   fillColor: "#e76f51",
-                  color: "#e76f51",
+                  color: "#000",
                   weight: 1,
+                  opacity: 1,
                   fillOpacity: 0.8
-                }).addTo(map).bindTooltip(`${city}, ${state}`);
+                }).bindTooltip(location).addTo(map);
               }
             });
         });
