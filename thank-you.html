@@ -1,21 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thank You!</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Thank You!</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #2a9d8f;
+    }
+
+    #map {
+      margin: 20px auto;
+      height: 600px;
+      width: 800px;
+      border: 2px solid #ccc;
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <img src="tribal dragon for coin 2.svg" alt="Treasure Coin Logo" width="200">
-        <h1>Thank You!</h1>
-    </header>
+  <h1>Thank You for Logging Your Treasure Coin!</h1>
+  <p>Here’s where Treasure Coins have been found so far:</p>
 
-    <p>Your log has been successfully submitted. Happy geocaching!</p>
+  <div id="map"></div>
 
-    <footer>
-        <p>Remember to hide your coin in a new cache soon!</p>
-    </footer>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    // Initialize the map
+    const map = L.map('map').setView([39.5, -98.35], 4); // Center on US
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Load data from published Google Sheet
+    fetch("https://docs.google.com/spreadsheets/d/e/2PACX-1vTWaKxHd44JeIfYteVBQJIZ4iMG6GoVARO6tqRpoorC5FrSiAhDktAxm7GpLwJ2ZozdIANpE0p2F9HM/pub?output=csv")
+      .then(response => response.text())
+      .then(csvText => {
+        const rows = csvText.split("\n").slice(1); // skip header
+        const cities = new Set();
+
+        rows.forEach(row => {
+          const cols = row.split(",");
+
+          const city = cols[3]?.trim();
+          const state = cols[4]?.trim();
+
+          if (!city || !state) return;
+
+          const location = `${city}, ${state}`;
+          if (cities.has(location)) return;
+          cities.add(location);
+
+          // Use OpenStreetMap Nominatim for city geocoding
+          fetch(`https://nominatim.openstreetmap.org/search?city=${encodeURIComponent(city)}&state=${encodeURIComponent(state)}&country=USA&format=json`)
+            .then(res => res.json())
+            .then(data => {
+              if (data && data[0]) {
+                const lat = parseFloat(data[0].lat);
+                const lon = parseFloat(data[0].lon);
+                L.circleMarker([lat, lon], {
+                  radius: 6,
+                  fillColor: "#e76f51",
+                  color: "#e76f51",
+                  weight: 1,
+                  fillOpacity: 0.8
+                }).addTo(map).bindTooltip(`${city}, ${state}`);
+              }
+            });
+        });
+      });
+  </script>
 </body>
 </html>
