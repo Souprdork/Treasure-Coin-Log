@@ -79,18 +79,18 @@
           if (city && state) cityMarkers.push(`${city}, ${state}`);
         });
 
-        // Shade found states
+        // Shade found states (dark red, semi-transparent)
         L.geoJson(statesData, {
           style: feature => ({
-            fillColor: foundStates.has(feature.properties.name) ? '#2a9d8f' : '#ccc',
+            fillColor: foundStates.has(feature.properties.name) ? '#8B0000' : '#ccc',
             weight: 1,
             opacity: 1,
             color: 'white',
-            fillOpacity: 0.7
+            fillOpacity: foundStates.has(feature.properties.name) ? 0.4 : 0.2
           })
         }).addTo(map);
 
-        // Place dots at found cities
+        // Place gold pins at found cities
         cityMarkers.forEach(location => {
           fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`)
             .then(res => res.json())
@@ -99,11 +99,11 @@
                 const { lat, lon } = data[0];
                 L.circleMarker([lat, lon], {
                   radius: 6,
-                  fillColor: "#e76f51",
-                  color: "#000",
+                  fillColor: "#FFD700",  // Gold
+                  color: "#000",         // Border
                   weight: 1,
                   opacity: 1,
-                  fillOpacity: 0.8
+                  fillOpacity: 0.9
                 }).bindTooltip(location).addTo(map);
               }
             });
